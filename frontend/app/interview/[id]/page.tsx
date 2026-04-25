@@ -64,7 +64,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
       // permission denied — still show setup screen with whatever labels we can get
     }
     const all = await navigator.mediaDevices.enumerateDevices();
-    const inputs = all.filter(d => d.kind === "audioinput");
+    const inputs = all.filter(d => d.kind === "audioinput" && !d.label.toLowerCase().startsWith("monitor of"));
     setDevices(inputs);
     setSelectedDeviceId(inputs[0]?.deviceId ?? "");
     updatePhase("setup");
