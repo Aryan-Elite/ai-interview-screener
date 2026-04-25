@@ -19,3 +19,7 @@ npm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Internal project context
+context/submission.md
+context/project-brief.md
