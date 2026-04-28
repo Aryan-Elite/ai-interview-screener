@@ -156,7 +156,7 @@ Evaluate on 5 dimensions, each with a score + specific quotes as evidence:
 3. Simplicity — can they break down complex ideas for a child?
 4. Patience — how do they handle confusion or frustration?
 5. Fluency — is their English clear and confident?
-Final output: score per dimension + recommendation (Move Forward / Hold)
+Final output: score per dimension + recommendation (Move Forward / Rejected)
 
 ### Timer Logic (Critical — implement exactly this)
 - Candidate sees: 06:00 timer counting down. Nothing else.

@@ -21,3 +21,9 @@
 | 2026-04-25 | Candidate auth added (signup/login, JWT) | Candidates need a persistent account to view their own result after it is released by an admin. Auth prevents one candidate from seeing another's report. |
 | 2026-04-25 | Admin dashboard + voting system added | Admins need to review AI-generated assessments before releasing results. Voting UI lets multiple admins weigh in; release toggle controls when the candidate can see the outcome. |
 | 2026-04-25 | Template system added (custom instructions + criteria per gradeRange) | Admins can tailor the interview prompt and assessment criteria per grade range (1-5, 3-8, 9-12) through the UI without any code changes. |
+| 2026-04-29 | "Hold" renamed to "Rejected" throughout (DB schema, prompts, frontend) | Clearer language — no ambiguity about candidate outcome. Both enum values and display labels updated. |
+| 2026-04-29 | `adminDecision` field added to Assessment | Admin vote now sets `adminDecision` and overrides AI recommendation for dashboard tab placement. AI's original `recommendation` stays untouched as audit trail. |
+| 2026-04-29 | Retake flow: rejected candidates can retake once | Single retry improves fairness. `retakeCount` on Candidate model enforces the limit. Retake creates a fresh Interview doc; old assessment stays orphaned. |
+| 2026-04-29 | Rejected candidates see scores + AI improvement tips | Transparency — candidates know why they weren't selected. `recommendations[]` added to Assessment model and returned by `/api/candidate/result` when released + Rejected. |
+| 2026-04-29 | AI greets candidate by name and asks for intro first | More natural conversation opening. `candidateName` passed into `getFirstQuestion()` and injected into the opening prompt. |
+| 2026-04-29 | Project renamed VoiceScreen → CueTalent | More on-brand for a Cuemath hiring product. Updated across all frontend UI files and browser tab title. |
