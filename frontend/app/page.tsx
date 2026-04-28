@@ -50,9 +50,9 @@ export default function LandingPage() {
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-2.5 mb-3">
           <div className="w-9 h-9 rounded-xl bg-violet-600 flex items-center justify-center">
-            <span className="text-white font-bold">V</span>
+            <span className="text-white font-bold">C</span>
           </div>
-          <span className="text-white font-bold text-xl tracking-wide">VoiceScreen</span>
+          <span className="text-white font-bold text-2xl tracking-wide">CueTalent</span>
         </div>
         <p className="text-violet-400 text-2xl font-semibold">AI Tutor Screener</p>
         <p className="text-gray-500 text-sm mt-1">Begin your journey as a Cuemath tutor</p>

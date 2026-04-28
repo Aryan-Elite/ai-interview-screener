@@ -23,9 +23,9 @@ export default function AdminSidebar({ email }: { email: string }) {
     <aside className="w-60 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 flex flex-col py-6 px-3 fixed h-full z-10">
       <div className="flex items-center gap-2.5 px-3 mb-10">
         <div className="w-8 h-8 rounded-xl bg-violet-600 flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-bold text-sm">V</span>
+          <span className="text-white font-bold text-sm">C</span>
         </div>
-        <span className="font-bold text-gray-900 dark:text-gray-100 text-lg">VoiceScreen</span>
+        <span className="font-bold text-gray-900 dark:text-gray-100 text-xl">CueTalent</span>
       </div>
 
       <nav className="flex-1 space-y-1">

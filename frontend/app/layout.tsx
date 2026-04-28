@@ -6,7 +6,7 @@ import ThemeProvider from "@/components/ThemeProvider";
 const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "VoiceScreen",
+  title: "CueTalent",
   description: "AI-powered tutor screening",
 };
 

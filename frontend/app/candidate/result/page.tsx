@@ -62,9 +62,9 @@ export default function CandidateResultPage() {
       <div className="w-full max-w-lg">
         <div className="flex items-center justify-center gap-2.5 mb-10">
           <div className="w-9 h-9 rounded-xl bg-violet-600 flex items-center justify-center">
-            <span className="text-white font-bold">V</span>
+            <span className="text-white font-bold">C</span>
           </div>
-          <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">VoiceScreen</span>
+          <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">CueTalent</span>
         </div>
 
         {data?.candidateName && (

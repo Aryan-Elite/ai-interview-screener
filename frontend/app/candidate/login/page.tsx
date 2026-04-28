@@ -36,9 +36,9 @@ export default function CandidateLoginPage() {
       <div className="hidden lg:flex lg:w-[45%] bg-violet-50 dark:bg-violet-950/20 flex-col justify-center px-14 border-r border-gray-200 dark:border-gray-800">
         <div className="flex items-center gap-2.5 mb-12">
           <div className="w-9 h-9 rounded-xl bg-violet-600 flex items-center justify-center">
-            <span className="text-white font-bold">V</span>
+            <span className="text-white font-bold">C</span>
           </div>
-          <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">VoiceScreen</span>
+          <span className="text-3xl font-bold text-gray-900 dark:text-gray-100">CueTalent</span>
         </div>
         <h1 className="text-5xl font-bold text-gray-900 dark:text-gray-100 mb-5 leading-tight">Welcome back!</h1>
         <p className="text-gray-500 dark:text-gray-400 text-lg leading-relaxed max-w-sm">
@@ -54,9 +54,9 @@ export default function CandidateLoginPage() {
         <div className="w-full max-w-sm">
           <div className="flex items-center gap-2 mb-10 lg:hidden">
             <div className="w-8 h-8 rounded-xl bg-violet-600 flex items-center justify-center">
-              <span className="text-white text-sm font-bold">V</span>
+              <span className="text-white text-sm font-bold">C</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-gray-100">VoiceScreen</span>
+            <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">CueTalent</span>
           </div>
 
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1.5">Check your result</h2>
