@@ -22,6 +22,12 @@ export interface Assessment {
   summary: string;
 }
 
+export interface ICriterion {
+  name: string;
+  description: string;
+  weight: number;
+}
+
 export interface IInterview extends Document {
   candidateName: string;
   gradeRange: "1-5" | "3-8" | "9-12";
@@ -29,6 +35,8 @@ export interface IInterview extends Document {
   startedAt: Date;
   conversation: IMessage[];
   assessment?: Assessment;
+  customInstructions: string;
+  criteria: ICriterion[];
   createdAt: Date;
 }
 
@@ -45,6 +53,11 @@ const InterviewSchema = new Schema<IInterview>(
         timestamp: { type: Date, default: Date.now },
       },
     ],
+    customInstructions: { type: String, default: "" },
+    criteria: {
+      type: [{ name: String, description: String, weight: Number }],
+      default: [],
+    },
     assessment: {
       clarity: { score: Number, quote: String },
       warmth: { score: Number, quote: String },

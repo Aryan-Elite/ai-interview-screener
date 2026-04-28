@@ -19,7 +19,12 @@ export async function handleChat(req: Request, res: Response) {
 
   const reply = wrapUp
     ? await getWrapUpMessage(interview.candidateName)
-    : await getChatReply(interview.conversation.map((m) => ({ role: m.role, content: m.content })));
+    : await getChatReply(
+        interview.conversation.map((m) => ({ role: m.role, content: m.content })),
+        interview.gradeRange,
+        interview.customInstructions,
+        interview.criteria
+      );
   const audio = await synthesizeSpeech(reply);
 
   interview.conversation.push({ role: "assistant", content: reply, timestamp: new Date() });

@@ -1,22 +1,44 @@
-export function buildAssessmentPrompt(transcript: string): string {
+interface Criterion { name: string; description: string; weight: number; }
+
+const DEFAULT_CRITERIA: Criterion[] = [
+  { name: "Clarity",    description: "Does the candidate explain things simply and precisely?", weight: 1 },
+  { name: "Warmth",     description: "Do they sound encouraging and kind?",                     weight: 1 },
+  { name: "Simplicity", description: "Can they break down complex ideas for a child?",           weight: 1 },
+  { name: "Patience",   description: "How do they handle confusion or frustration?",             weight: 1 },
+  { name: "Fluency",    description: "Is their English clear and confident?",                    weight: 1 },
+];
+
+function toKey(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, "_");
+}
+
+export function buildAssessmentPrompt(transcript: string, customCriteria: Criterion[] = []): string {
+  const allCriteria = [...DEFAULT_CRITERIA, ...customCriteria];
+
+  const dimensionList = allCriteria.map((c, i) => {
+    const extra = c.weight > 1 ? ` [priority weight: ${c.weight}/5]` : "";
+    return `${i + 1}. ${c.name}${extra} — ${c.description}`;
+  }).join("\n");
+
+  const jsonShape = allCriteria.map(c =>
+    `  "${toKey(c.name)}": { "score": number, "quote": string }`
+  ).join(",\n");
+
   return `You are evaluating a Cuemath tutor candidate based on this interview transcript.
 
-IMPORTANT: Only evaluate lines labeled "Candidate:". Completely ignore lines labeled "AI:". The AI lines are interview questions — they are not part of the evaluation. Quotes must come only from "Candidate:" lines.
+IMPORTANT: Only evaluate lines labeled "Candidate:". Completely ignore lines labeled "AI:". Quotes must come only from "Candidate:" lines.
 
-Score the candidate on 5 dimensions (1-10 each) with a direct quote from their own words as evidence.
+Score the candidate on these dimensions (1-5 each) with a direct quote as evidence:
+
+${dimensionList}
 
 Transcript:
 ${transcript}
 
 Return JSON in exactly this shape:
 {
-  "clarity":    { "score": number, "quote": string },
-  "warmth":     { "score": number, "quote": string },
-  "simplicity": { "score": number, "quote": string },
-  "patience":   { "score": number, "quote": string },
-  "fluency":    { "score": number, "quote": string },
+${jsonShape},
   "recommendation": "Move Forward" | "Hold",
   "summary": string
 }`;
 }
-

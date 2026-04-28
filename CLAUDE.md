@@ -10,10 +10,32 @@ Candidate speaks answers → AI asks follow-up questions → generates structure
 - Frontend calls backend via NEXT_PUBLIC_API_URL env variable
 
 ## Backend endpoints
-- POST /api/interview → creates a new interview session, returns interview ID
-- POST /api/chat → takes conversation messages → returns AI response + audio
+
+### Core interview flow
+- POST /api/interview → creates a new interview session, returns interview ID + first question + audio
+- POST /api/chat → takes conversation messages + elapsed time → returns AI response + audio (triggers wrap-up at 5 min)
 - POST /api/assess → takes full transcript → returns structured assessment JSON
 - GET /api/report/:id → fetches stored interview + assessment by ID
+- GET /api/stt-token → returns a short-lived Speechmatics JWT for browser-side STT
+
+### Auth
+- POST /api/auth/admin/login → admin login, returns JWT
+- POST /api/auth/candidate/signup → candidate registration (name, email, password)
+- POST /api/auth/candidate/login → candidate login, returns JWT
+
+### Candidate portal (requires candidate JWT)
+- GET /api/candidate/result → returns candidate's own assessment status (pending / released + recommendation)
+
+### Admin dashboard (requires admin JWT)
+- GET /api/admin/assessments → list all assessments
+- GET /api/admin/assessments/:id → get single assessment details
+- POST /api/admin/assessments/:id/release → toggle result release to candidate
+- POST /api/admin/assessments/:id/vote → cast admin vote on assessment
+
+### Templates (requires admin JWT)
+- GET /api/admin/templates → list all grade-range templates
+- POST /api/admin/templates/:range → create or update template for a grade range
+- POST /api/admin/templates/:range/toggle → activate / deactivate a template
 
 ## Rules
 - OPENAI_API_KEY lives only in backend/.env — never in frontend
@@ -181,22 +203,55 @@ export async function getAssessment(transcript: string) {
 - When a new backend endpoint is added, its corresponding function must be added to `lib/api.ts` first before using it anywhere in the UI
 
 ## Key files
-- backend/src/index.ts — Express app entry point
+
+### Backend — entry & routes
+- backend/src/index.ts — Express app entry point, all routes registered here
 - backend/src/routes/interview.ts — POST /api/interview
 - backend/src/routes/chat.ts — POST /api/chat
 - backend/src/routes/assess.ts — POST /api/assess
 - backend/src/routes/report.ts — GET /api/report/:id
+- backend/src/routes/auth.ts — candidate + admin auth routes
+- backend/src/routes/candidate.ts — candidate self-service routes
+- backend/src/routes/admin.ts — admin dashboard routes
+- backend/src/routes/templates.ts — template CRUD routes
+
+### Backend — controllers
 - backend/src/controllers/interviewController.ts — interview session creation
 - backend/src/controllers/chatController.ts — conversation logic (no direct API calls)
-- backend/src/controllers/assessController.ts — assessment logic (no direct API calls)
+- backend/src/controllers/assessController.ts — assessment logic, computes overall score in code
+- backend/src/controllers/authController.ts — candidate signup/login, admin login
+- backend/src/controllers/adminController.ts — list/get assessments, voting, release toggle
+- backend/src/controllers/templateController.ts — template CRUD + toggle
+
+### Backend — services (swap here only)
 - backend/src/services/llm.ts — ALL OpenAI chat/assessment calls live here only
 - backend/src/services/tts.ts — ALL OpenAI TTS calls live here only
 - backend/src/services/stt.ts — ALL Speechmatics/STT calls live here only
-- backend/src/models/Interview.ts — MongoDB schema
+
+### Backend — models
+- backend/src/models/Interview.ts — interview session schema (conversation history, criteria)
+- backend/src/models/Assessment.ts — assessment results schema (scores, recommendation, release flag)
+- backend/src/models/Candidate.ts — candidate user schema (email, passwordHash, interviewId)
+- backend/src/models/Admin.ts — admin user schema
+- backend/src/models/Template.ts — custom instructions + criteria per gradeRange
+
+### Backend — middleware & prompts
+- backend/src/middleware/requireAdmin.ts — JWT admin auth guard
+- backend/src/middleware/requireCandidate.ts — JWT candidate auth guard
 - backend/src/prompts/interviewer.ts — interviewer & wrap-up prompts
 - backend/src/prompts/assessment.ts — assessment evaluation prompt
+
+### Frontend — pages
+- frontend/app/page.tsx — landing page (name + email + grade selection)
+- frontend/app/interview/[id]/page.tsx — interview UI (voice + live transcript + timer)
+- frontend/app/report/[id]/page.tsx — report display UI
+- frontend/app/candidate/login/page.tsx — candidate login/signup UI
+- frontend/app/candidate/result/page.tsx — candidate's own result view (post-release)
+- frontend/app/admin/login/page.tsx — admin login UI
+- frontend/app/admin/dashboard/page.tsx — admin assessment list with filters
+- frontend/app/admin/candidate/[id]/page.tsx — detailed assessment view + voting UI
+- frontend/app/admin/templates/page.tsx — template editor UI per grade range
+
+### Frontend — lib
 - frontend/lib/api.ts — ALL backend API calls from frontend live here only
 - frontend/lib/stt/speechmatics.ts — Speechmatics STT WebSocket client
-- frontend/app/page.tsx — landing page (name + grade selection)
-- frontend/app/interview/[id]/page.tsx — interview UI (voice + live transcript)
-- frontend/app/report/[id]/page.tsx — report display UI

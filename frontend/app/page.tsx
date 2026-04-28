@@ -1,29 +1,41 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createInterview } from "@/lib/api";
+import Link from "next/link";
+import { candidateSignup, createInterview } from "@/lib/api";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 const GRADES = ["1-5", "3-8", "9-12"] as const;
 
 export default function LandingPage() {
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [grade, setGrade] = useState<string>("3-8");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
   async function handleStart() {
-    if (!name.trim()) { setError("Please enter your name"); return; }
+    if (!name.trim()) { setError("Please enter your full name"); return; }
+    if (!email.trim()) { setError("Please enter your email"); return; }
+    if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
     setLoading(true);
     setError("");
     try {
-      const res = await createInterview(name.trim(), grade);
-      if (!res.success) throw new Error(res.error);
-      sessionStorage.setItem(`iv_${res.data.interviewId}`, JSON.stringify({
-        firstQuestion: res.data.firstQuestion,
-        audio: res.data.audio,
+      const signup = await candidateSignup(name.trim(), email.trim(), password);
+      if (!signup.success) throw new Error(signup.error);
+      const { token, candidateId } = signup.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("candidateId", candidateId);
+      const interview = await createInterview(name.trim(), grade, candidateId);
+      if (!interview.success) throw new Error(interview.error);
+      sessionStorage.setItem(`iv_${interview.data.interviewId}`, JSON.stringify({
+        firstQuestion: interview.data.firstQuestion,
+        audio: interview.data.audio,
       }));
-      router.push(`/interview/${res.data.interviewId}`);
+      router.push(`/interview/${interview.data.interviewId}`);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Something went wrong");
       setLoading(false);
@@ -31,58 +43,63 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="inline-flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-sm font-bold">C</div>
-            <span className="text-[#8b949e] text-sm font-medium">Cuemath</span>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 bg-gray-950">
+
+
+      {/* Branding above card */}
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center gap-2.5 mb-3">
+          <div className="w-9 h-9 rounded-xl bg-violet-600 flex items-center justify-center">
+            <span className="text-white font-bold">V</span>
           </div>
-          <h1 className="text-2xl font-semibold text-[#f0f6fc] mb-2">AI Voice Screening</h1>
-          <p className="text-[#8b949e] text-sm leading-relaxed">
-            A 6-minute conversation to evaluate your communication, patience, and teaching style.
-          </p>
+          <span className="text-white font-bold text-xl tracking-wide">VoiceScreen</span>
+        </div>
+        <p className="text-violet-400 text-2xl font-semibold">AI Tutor Screener</p>
+        <p className="text-gray-500 text-sm mt-1">Begin your journey as a Cuemath tutor</p>
+      </div>
+
+      {/* Card */}
+      <div className="w-full max-w-md rounded-2xl p-8 bg-gray-900 border border-gray-800 space-y-5">
+        <div>
+          <h2 className="text-white text-2xl font-semibold">Sign Up</h2>
+          <p className="text-gray-500 text-base mt-1">Fill in your details to start the AI screening</p>
         </div>
 
-        {/* What to expect */}
-        <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-4 mb-4">
-          <p className="text-xs font-medium text-[#8b949e] uppercase tracking-wider mb-3">What to expect</p>
-          <ul className="space-y-2 text-sm text-[#f0f6fc]">
-            {["6-minute voice conversation", "Evaluated on communication & warmth", "Results available immediately"].map(item => (
-              <li key={item} className="flex items-center gap-2">
-                <span className="text-indigo-400">✓</span> {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Form */}
-        <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-4 mb-4 space-y-3">
+        <div className="space-y-4">
           <div>
-            <label className="text-xs font-medium text-[#8b949e] uppercase tracking-wider block mb-1.5">Your Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
+            <Label htmlFor="name" className="text-gray-300 text-base font-medium">Full Name</Label>
+            <Input id="name" type="text" value={name} onChange={e => setName(e.target.value)}
+              placeholder="e.g. Priya Sharma"
+              className="mt-1.5 h-11 text-base text-white bg-gray-800 border-gray-700 placeholder:text-gray-600" />
+          </div>
+
+          <div>
+            <Label htmlFor="email" className="text-gray-300 text-base font-medium">Email address</Label>
+            <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="mt-1.5 h-11 text-base text-white bg-gray-800 border-gray-700 placeholder:text-gray-600" />
+          </div>
+
+          <div>
+            <Label htmlFor="password" className="text-gray-300 text-base font-medium">Password</Label>
+            <p className="text-xs text-gray-600 mt-0.5 mb-1.5">You&apos;ll use this to check your result later</p>
+            <Input id="password" type="password" value={password}
+              onChange={e => setPassword(e.target.value)}
               onKeyDown={e => e.key === "Enter" && handleStart()}
-              placeholder="Enter your full name"
-              className="w-full bg-[#0d0f14] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-[#f0f6fc] placeholder-[#8b949e] focus:outline-none focus:border-indigo-500"
-            />
+              placeholder="Min. 6 characters"
+              className="h-11 text-base text-white bg-gray-800 border-gray-700 placeholder:text-gray-600" />
           </div>
+
           <div>
-            <label className="text-xs font-medium text-[#8b949e] uppercase tracking-wider block mb-1.5">Grade Range</label>
-            <div className="flex gap-2">
+            <Label className="text-gray-300 text-base font-medium">Grade Range You Teach</Label>
+            <div className="flex gap-2 mt-1.5">
               {GRADES.map(g => (
-                <button
-                  key={g}
-                  onClick={() => setGrade(g)}
-                  className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                <button key={g} onClick={() => setGrade(g)}
+                  className={`flex-1 py-2.5 rounded-lg text-base font-medium border transition-all ${
                     grade === g
-                      ? "bg-indigo-600 border-indigo-600 text-white"
-                      : "bg-[#0d0f14] border-[#30363d] text-[#8b949e] hover:border-indigo-500"
-                  }`}
-                >
+                      ? "bg-violet-600 border-violet-600 text-white"
+                      : "bg-gray-800 border-gray-700 text-gray-400 hover:border-violet-500"
+                  }`}>
                   {g}
                 </button>
               ))}
@@ -90,16 +107,33 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
+        {error && (
+          <p className="text-red-400 text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2.5">{error}</p>
+        )}
 
-        <button
-          onClick={handleStart}
-          disabled={loading}
-          className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-xl transition-colors text-sm"
-        >
-          {loading ? "Starting interview..." : "Start Screening"}
+        <button onClick={handleStart} disabled={loading}
+          className="w-full h-12 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-semibold text-base transition-colors disabled:opacity-60">
+          {loading ? "Setting up your interview..." : "Continue"}
         </button>
+
+        <div className="flex items-center justify-between text-sm pt-1">
+          <p className="text-gray-600">
+            Already applied?{" "}
+            <Link href="/candidate/login" className="text-gray-400 hover:text-white transition-colors">
+              Check your result
+            </Link>
+          </p>
+          <Link href="/admin/login"
+            className="text-violet-400 font-medium border border-violet-700 hover:border-violet-400 hover:text-violet-300 px-3 py-1.5 rounded-lg transition-colors">
+            Admin Portal →
+          </Link>
+        </div>
       </div>
+
+      {/* Footer */}
+      <p className="mt-6 text-gray-700 text-xs">
+        By continuing, you agree to our Terms of Service and Privacy Policy.
+      </p>
     </div>
   );
 }

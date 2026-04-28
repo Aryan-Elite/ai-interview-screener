@@ -34,6 +34,9 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   const [micStatus, setMicStatus] = useState<MicStatus>("idle");
   const [audioLevel, setAudioLevel] = useState(0);
 
+  const tabSwitches = useRef<{ timestamp: number; timeElapsed: number }[]>([]);
+  const [showWarning, setShowWarning] = useState(false);
+
   const elapsed = useRef(0);
   const accumulated = useRef("");
   const silenceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -134,7 +137,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
     updatePhase("done");
     setStatusMsg("Generating your report...");
     stopSttRef.current?.();
-    await generateAssessment(id);
+    await generateAssessment(id, tabSwitches.current);
     router.push(`/report/${id}`);
   }
 
@@ -212,12 +215,28 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
     };
   }, []);
 
+  useEffect(() => {
+    function handleVisibility() {
+      if (!document.hidden) return;
+      tabSwitches.current.push({ timestamp: Date.now(), timeElapsed: 360 - timeLeft });
+      setShowWarning(true);
+      setTimeout(() => setShowWarning(false), 4000);
+    }
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [timeLeft]);
+
   const mins = String(Math.floor(timeLeft / 60)).padStart(2, "0");
   const secs = String(timeLeft % 60).padStart(2, "0");
   const timerColor = timeLeft < 60 ? "text-red-400" : "text-[#f0f6fc]";
 
   return (
     <div className="min-h-screen flex flex-col">
+      {showWarning && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-amber-900/90 border border-amber-600 text-amber-200 px-5 py-3 rounded-xl text-sm font-medium shadow-lg">
+          ⚠ Warning: Leaving the interview tab may be flagged for review
+        </div>
+      )}
       {/* Top bar */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-[#30363d]">
         <div className="flex items-center gap-2">

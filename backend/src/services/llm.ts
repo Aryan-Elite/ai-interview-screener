@@ -7,9 +7,9 @@ const getClient = () => new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 type Message = { role: "system" | "user" | "assistant"; content: string };
 
-export async function getChatReply(messages: Message[]): Promise<string> {
+export async function getChatReply(messages: Message[], gradeRange?: string, customInstructions?: string, criteria?: Criterion[]): Promise<string> {
   const allMessages: Message[] = [
-    { role: "system", content: buildInterviewerPrompt() },
+    { role: "system", content: buildInterviewerPrompt(gradeRange, customInstructions, criteria) },
     ...messages,
   ];
 
@@ -30,21 +30,23 @@ export async function getWrapUpMessage(candidateName: string): Promise<string> {
   return res.choices[0].message.content ?? "";
 }
 
-export async function getFirstQuestion(gradeRange: string): Promise<string> {
+export async function getFirstQuestion(gradeRange: string, customInstructions?: string, criteria?: Criterion[]): Promise<string> {
   const res = await getClient().chat.completions.create({
     model: process.env.OPENAI_MODEL_CHAT!,
     messages: [
-      { role: "system", content: buildInterviewerPrompt() },
+      { role: "system", content: buildInterviewerPrompt(gradeRange, customInstructions, criteria) },
       { role: "user", content: `Start the interview. Grade range: ${gradeRange}. Ask your first question.` },
     ],
   });
   return res.choices[0].message.content ?? "";
 }
 
-export async function getAssessment(transcript: string): Promise<Assessment> {
+type Criterion = { name: string; description: string; weight: number };
+
+export async function getAssessment(transcript: string, customCriteria: Criterion[] = []): Promise<Assessment> {
   const res = await getClient().chat.completions.create({
     model: process.env.OPENAI_MODEL_ASSESS!,
-    messages: [{ role: "user", content: buildAssessmentPrompt(transcript) }],
+    messages: [{ role: "user", content: buildAssessmentPrompt(transcript, customCriteria) }],
     response_format: { type: "json_object" },
   });
 

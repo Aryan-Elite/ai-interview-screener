@@ -8,6 +8,10 @@ import interviewRoutes from "./routes/interview";
 import chatRoutes from "./routes/chat";
 import assessRoutes from "./routes/assess";
 import reportRoutes from "./routes/report";
+import authRoutes from "./routes/auth";
+import candidateRoutes from "./routes/candidate";
+import adminRoutes from "./routes/admin";
+import templateRoutes from "./routes/templates";
 
 const app = express();
 app.use(cors());
@@ -18,6 +22,10 @@ app.use((req, _res, next) => {
   next();
 });
 
+app.use("/api/auth", authRoutes);
+app.use("/api/candidate", candidateRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/admin/templates", templateRoutes);
 app.use("/api/interview", interviewRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/assess", assessRoutes);
