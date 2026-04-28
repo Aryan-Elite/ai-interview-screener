@@ -12,12 +12,13 @@ type Assessment = {
   candidateEmail: string;
   gradeRange: string;
   overallScore: number;
-  recommendation: "Move Forward" | "Hold";
+  recommendation: "Move Forward" | "Rejected";
+  adminDecision: "Move Forward" | "Rejected" | null;
   resultReleased: boolean;
   createdAt: string;
 };
 
-const FILTERS = ["All", "Move Forward", "Hold"] as const;
+const FILTERS = ["All", "Move Forward", "Rejected"] as const;
 
 export default function AdminDashboard() {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
@@ -125,12 +126,23 @@ export default function AdminDashboard() {
                       <span className="text-gray-400 dark:text-gray-500 text-sm">/5</span>
                     </td>
                     <td className="px-5 py-4">
-                      <Badge variant="outline"
-                        className={`text-sm ${a.recommendation === "Move Forward"
-                          ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400"
-                          : "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400"}`}>
-                        {a.recommendation}
-                      </Badge>
+                      {(() => {
+                        const display = a.adminDecision ?? a.recommendation;
+                        const isForward = display === "Move Forward";
+                        return (
+                          <div className="flex flex-col gap-0.5">
+                            <Badge variant="outline"
+                              className={`text-sm w-fit ${isForward
+                                ? "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400"
+                                : "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400"}`}>
+                              {display}
+                            </Badge>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">
+                              {a.adminDecision ? "Admin decision" : "AI decision"}
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="px-5 py-4">
                       <span className={`text-base font-medium ${a.resultReleased

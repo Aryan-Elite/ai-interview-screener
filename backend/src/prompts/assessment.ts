@@ -38,7 +38,10 @@ ${transcript}
 Return JSON in exactly this shape:
 {
 ${jsonShape},
-  "recommendation": "Move Forward" | "Hold",
-  "summary": string
-}`;
+  "recommendation": "Move Forward" | "Rejected",
+  "summary": string,
+  "recommendations": string[]
+}
+
+For "recommendations": if recommendation is "Rejected", provide 2-3 specific, actionable improvement tips based on the dimensions where the candidate scored below 3. If recommendation is "Move Forward", return an empty array.`;
 }

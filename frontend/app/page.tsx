@@ -116,15 +116,13 @@ export default function LandingPage() {
           {loading ? "Setting up your interview..." : "Continue"}
         </button>
 
-        <div className="flex items-center justify-between text-sm pt-1">
-          <p className="text-gray-600">
-            Already applied?{" "}
-            <Link href="/candidate/login" className="text-gray-400 hover:text-white transition-colors">
-              Check your result
-            </Link>
-          </p>
+        <div className="flex flex-col items-center gap-2 pt-1">
+          <Link href="/candidate/login"
+            className="w-full text-center text-gray-400 font-medium border border-gray-700 hover:border-gray-500 hover:text-white px-3 py-1.5 rounded-lg transition-colors text-sm">
+            Already applied? Check your result
+          </Link>
           <Link href="/admin/login"
-            className="text-violet-400 font-medium border border-violet-700 hover:border-violet-400 hover:text-violet-300 px-3 py-1.5 rounded-lg transition-colors">
+            className="w-full text-center text-violet-400 font-medium border border-violet-700 hover:border-violet-400 hover:text-violet-300 px-3 py-1.5 rounded-lg transition-colors text-sm">
             Admin Portal →
           </Link>
         </div>

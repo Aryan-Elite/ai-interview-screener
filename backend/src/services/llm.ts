@@ -30,12 +30,12 @@ export async function getWrapUpMessage(candidateName: string): Promise<string> {
   return res.choices[0].message.content ?? "";
 }
 
-export async function getFirstQuestion(gradeRange: string, customInstructions?: string, criteria?: Criterion[]): Promise<string> {
+export async function getFirstQuestion(gradeRange: string, candidateName: string, customInstructions?: string, criteria?: Criterion[]): Promise<string> {
   const res = await getClient().chat.completions.create({
     model: process.env.OPENAI_MODEL_CHAT!,
     messages: [
       { role: "system", content: buildInterviewerPrompt(gradeRange, customInstructions, criteria) },
-      { role: "user", content: `Start the interview. Grade range: ${gradeRange}. Ask your first question.` },
+      { role: "user", content: `The candidate's name is ${candidateName}. Start with a warm, personalized welcome using their name, then ask them to briefly introduce themselves and share their experience teaching Grade ${gradeRange} students.` },
     ],
   });
   return res.choices[0].message.content ?? "";

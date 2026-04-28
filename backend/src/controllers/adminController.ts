@@ -4,9 +4,14 @@ import Interview from "../models/Interview";
 
 export async function listAssessments(req: Request, res: Response) {
   const { recommendation } = req.query;
-  const filter: Record<string, unknown> = {};
-  if (recommendation === "Move Forward" || recommendation === "Hold") {
-    filter.recommendation = recommendation;
+  let filter: Record<string, unknown> = {};
+  if (recommendation === "Move Forward" || recommendation === "Rejected") {
+    filter = {
+      $or: [
+        { adminDecision: recommendation },
+        { adminDecision: null, recommendation },
+      ],
+    };
   }
   const assessments = await AssessmentModel.find(filter).sort({ createdAt: -1 });
   res.json({ success: true, data: { assessments } });
@@ -36,8 +41,8 @@ export async function castVote(req: Request, res: Response) {
   const { vote } = req.body;
   const adminEmail = (req as any).adminEmail;
 
-  if (vote !== "move_forward" && vote !== "hold") {
-    return res.status(400).json({ success: false, error: "Vote must be move_forward or hold" });
+  if (vote !== "move_forward" && vote !== "rejected") {
+    return res.status(400).json({ success: false, error: "Vote must be move_forward or rejected" });
   }
 
   const assessment = await AssessmentModel.findById(id);
@@ -51,6 +56,7 @@ export async function castVote(req: Request, res: Response) {
     assessment.votes.push({ adminEmail, vote, votedAt: new Date() });
   }
 
+  assessment.adminDecision = vote === "move_forward" ? "Move Forward" : "Rejected";
   await assessment.save();
   res.json({ success: true, data: { votes: assessment.votes } });
 }

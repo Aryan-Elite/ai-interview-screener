@@ -9,7 +9,7 @@ export interface ICheatFlag {
 
 export interface IVote {
   adminEmail: string;
-  vote: "move_forward" | "hold";
+  vote: "move_forward" | "rejected";
   votedAt: Date;
 }
 
@@ -25,11 +25,13 @@ export interface IAssessment extends Document {
   gradeRange: string;
   scores: Record<string, number>;
   overallScore: number;
-  recommendation: "Move Forward" | "Hold";
+  recommendation: "Move Forward" | "Rejected";
   summary: string;
+  recommendations: string[];
   quotes: IQuote[];
   cheatFlags: ICheatFlag[];
   votes: IVote[];
+  adminDecision: "Move Forward" | "Rejected" | null;
   resultReleased: boolean;
   createdAt: Date;
 }
@@ -42,8 +44,9 @@ const AssessmentSchema = new Schema<IAssessment>(
     gradeRange: { type: String, required: true },
     scores: { type: Map, of: Number, required: true },
     overallScore: { type: Number, required: true },
-    recommendation: { type: String, enum: ["Move Forward", "Hold"], required: true },
+    recommendation: { type: String, enum: ["Move Forward", "Rejected"], required: true },
     summary: { type: String, default: "" },
+    recommendations: { type: [String], default: [] },
     quotes: [{ dimension: String, quote: String }],
     cheatFlags: [
       {
@@ -53,11 +56,12 @@ const AssessmentSchema = new Schema<IAssessment>(
         reason: String,
       },
     ],
+    adminDecision: { type: String, enum: ["Move Forward", "Rejected"], default: null },
     resultReleased: { type: Boolean, default: false },
     votes: [
       {
         adminEmail: { type: String, required: true },
-        vote: { type: String, enum: ["move_forward", "hold"], required: true },
+        vote: { type: String, enum: ["move_forward", "rejected"], required: true },
         votedAt: { type: Date, default: Date.now },
       },
     ],

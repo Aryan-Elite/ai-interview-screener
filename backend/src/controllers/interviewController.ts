@@ -16,7 +16,7 @@ export async function createInterview(req: Request, res: Response) {
   const customInstructions = template?.customInstructions ?? "";
   const criteria = template?.criteria ?? [];
 
-  const firstQuestion = await getFirstQuestion(gradeRange, customInstructions, criteria);
+  const firstQuestion = await getFirstQuestion(gradeRange, candidateName, customInstructions, criteria);
   const audio = await synthesizeSpeech(firstQuestion);
 
   const interview = await Interview.create({

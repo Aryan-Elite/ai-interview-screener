@@ -46,6 +46,14 @@ export async function getCandidateResult() {
   return res.json();
 }
 
+export async function retakeInterview() {
+  const res = await fetch(`${BASE}/api/candidate/retake`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeader() },
+  });
+  return res.json();
+}
+
 // --- Admin ---
 
 export async function getAssessments(recommendation?: string) {
@@ -71,7 +79,7 @@ export async function toggleResultRelease(id: string) {
   return res.json();
 }
 
-export async function castVote(id: string, vote: "move_forward" | "hold") {
+export async function castVote(id: string, vote: "move_forward" | "rejected") {
   const res = await fetch(`${BASE}/api/admin/assessments/${id}/vote`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...adminAuthHeader() },

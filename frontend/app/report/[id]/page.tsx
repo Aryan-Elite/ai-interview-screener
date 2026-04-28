@@ -20,7 +20,14 @@ export default function ThankYouPage() {
           </p>
         </div>
 
-        <p className="mt-6 text-xs text-[#8b949e]">
+        <div className="mt-5 bg-[#161b22] border border-[#30363d] rounded-xl px-4 py-3 text-left">
+          <p className="text-[#f0f6fc] text-sm font-medium mb-0.5">1 retake available</p>
+          <p className="text-[#8b949e] text-xs leading-relaxed">
+            If you&apos;re not selected, you can retake the screening once. Log in to your result page to use it.
+          </p>
+        </div>
+
+        <p className="mt-4 text-xs text-[#8b949e]">
           Want to check your result later?{" "}
           <Link href="/candidate/login" className="text-indigo-400 hover:underline">
             Log in here →

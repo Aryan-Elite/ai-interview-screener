@@ -50,8 +50,9 @@ export async function generateAssessment(req: Request, res: Response) {
     ? Math.round((weightedSum / totalWeight) * 10) / 10
     : 0;
 
-  const recommendation = raw.recommendation as "Move Forward" | "Hold";
+  const recommendation = raw.recommendation as "Move Forward" | "Rejected";
   const summary = (raw.summary as string) ?? "";
+  const recommendations = Array.isArray(raw.recommendations) ? (raw.recommendations as string[]) : [];
 
   const candidate = await Candidate.findOne({ interviewId: interview._id });
 
@@ -64,6 +65,7 @@ export async function generateAssessment(req: Request, res: Response) {
     overallScore,
     recommendation,
     summary,
+    recommendations,
     quotes,
     cheatFlags: tabSwitches.map((s: { timestamp: number; timeElapsed: number }) => ({
       type: "tab_switch",
