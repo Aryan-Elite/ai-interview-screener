@@ -5,32 +5,17 @@ import { getTemplates, saveTemplate, toggleTemplate } from "@/lib/api";
 import AdminSidebar from "@/components/AdminSidebar";
 
 function InfoTooltip({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
   return (
-    <div ref={ref} className="relative inline-flex items-center">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="text-gray-400 hover:text-violet-500 dark:hover:text-violet-400 transition-colors flex-shrink-0">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+    <div className="relative inline-flex items-center group">
+      <button className="text-violet-400 dark:text-violet-500 hover:text-violet-600 dark:hover:text-violet-300 transition-colors flex-shrink-0">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="10" />
           <path d="M12 16v-4M12 8h.01" strokeLinecap="round" />
         </svg>
       </button>
-      {open && (
-        <div className="absolute left-6 top-0 z-50 w-72 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4">
-          {children}
-        </div>
-      )}
+      <div className="absolute left-6 top-0 z-50 w-72 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 hidden group-hover:block">
+        {children}
+      </div>
     </div>
   );
 }
@@ -231,27 +216,25 @@ export default function TemplatesPage() {
               Customize how the AI interviews candidates for each grade range.
             </p>
           </div>
+          <hr className="border-gray-200 dark:border-gray-700 mb-6" />
 
           <div className="mt-8 mb-4">
             <div className="flex items-center gap-2 mb-1">
               <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Custom Interview Templates</h2>
               <span className="text-xs font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">Optional</span>
+              <InfoTooltip>
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">What is this?</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  By default, the AI follows built-in interview guidelines. Use this to add extra instructions for a specific grade range — like topics to focus on or a different tone.
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mt-2">
+                  Leave it empty if the default behavior works fine.
+                </p>
+              </InfoTooltip>
             </div>
-            <p className="text-gray-500 dark:text-gray-400 text-sm max-w-2xl">
+            <p className="text-gray-500 dark:text-gray-400 text-base max-w-2xl">
               Add custom instructions for each grade range. They layer on top of built-in behavior and take priority when they overlap.
             </p>
-          </div>
-
-          <div className="mb-6">
-            <InfoTooltip>
-              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Always active — Built-in AI behavior</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                Be warm and professional. Evaluate soft skills only: clarity, patience, warmth, ability to simplify, fluency. Follow up on vague answers.
-              </p>
-              <p className="text-xs text-violet-500 dark:text-violet-400 mt-3 font-medium border-t border-gray-100 dark:border-gray-800 pt-3">
-                ↑ Your custom instructions are added on top and take priority
-              </p>
-            </InfoTooltip>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 max-w-5xl items-start">
@@ -341,15 +324,26 @@ export default function TemplatesPage() {
           </div>
         </section>
 
+        <hr className="border-gray-200 dark:border-gray-700 my-8" />
+
         {/* ── Scoring Criteria ── */}
         <section className="max-w-3xl">
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-1">
               <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Scoring Criteria</h2>
               <span className="text-xs font-medium text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">Optional</span>
+              <InfoTooltip>
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">What is this?</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                  The AI always scores every candidate on 5 built-in dimensions: Clarity, Warmth, Simplicity, Patience, and Fluency.
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mt-2">
+                  Use this only if you need to evaluate something extra for a specific grade range. Otherwise, leave it empty.
+                </p>
+              </InfoTooltip>
             </div>
             <p className="text-gray-500 dark:text-gray-400 text-base max-w-xl">
-              The AI always scores on 5 built-in dimensions. Add your own on top — only if needed for a specific grade range.
+              The AI scores every candidate on 5 default dimensions. If a grade range needs something extra, you can add custom criteria on top.
             </p>
           </div>
 
@@ -371,7 +365,7 @@ export default function TemplatesPage() {
 
             {/* Built-in dimensions */}
             <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
-              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Always scored — built-in</p>
+              <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Default scoring criteria</p>
               <div className="flex flex-wrap gap-2">
                 {BUILT_IN_DIMENSIONS.map(d => (
                   <span key={d} className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-full border border-gray-200 dark:border-gray-700">

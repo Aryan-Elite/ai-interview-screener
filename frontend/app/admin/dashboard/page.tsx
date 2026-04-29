@@ -55,6 +55,7 @@ export default function AdminDashboard() {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Interviews</h1>
           <p className="text-gray-500 dark:text-gray-400 text-base mt-1">Review and manage all candidate screenings.</p>
+          <hr className="border-gray-200 dark:border-gray-700 mt-4" />
         </div>
 
         <div className="flex items-start gap-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/40 rounded-xl px-4 py-3.5 mb-6">
@@ -65,7 +66,7 @@ export default function AdminDashboard() {
           <div>
             <p className="text-sm font-semibold text-blue-700 dark:text-blue-400 mb-0.5">AI + Human Review</p>
             <p className="text-sm text-blue-600 dark:text-blue-500 leading-relaxed">
-              The AI is capable of independently evaluating candidates — but human review is always recommended to ensure every decision is accurate, fair, and context-aware. Use these scores as a starting point, not a final verdict.
+              AI scoring is non-deterministic. Read the transcript, review the scores, and consider the candidate's context before releasing any result. Your judgment ensures every outcome is fair and accurate.
             </p>
           </div>
         </div>
