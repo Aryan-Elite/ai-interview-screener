@@ -20,6 +20,7 @@ type Assessment = {
   scores: Score;
   overallScore: number;
   recommendation: "Move Forward" | "Rejected";
+  adminDecision: "Move Forward" | "Rejected" | null;
   summary: string;
   quotes: Quote[];
   cheatFlags: { type: string; segment: string; timestamp: number; reason: string }[];
@@ -62,10 +63,11 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
 
   async function confirmVote() {
     if (!pendingVote) return;
+    const vote = pendingVote;
     setVoting(true);
     setPendingVote(null);
-    const res = await castVote(id, pendingVote);
-    if (res.success) setAssessment(a => a ? { ...a, votes: res.data.votes } : a);
+    const res = await castVote(id, vote);
+    if (res.success) setAssessment(a => a ? { ...a, votes: res.data.votes, adminDecision: vote === "move_forward" ? "Move Forward" : "Rejected" } : a);
     setVoting(false);
   }
 
@@ -147,13 +149,23 @@ export default function CandidateDetailPage({ params }: { params: Promise<{ id: 
                 <p className="text-5xl font-bold text-gray-900 dark:text-gray-100">
                   {assessment.overallScore}<span className="text-xl font-normal text-gray-400 dark:text-gray-500">/5</span>
                 </p>
-                <Badge className={`mt-2 text-sm ${
-                  assessment.recommendation === "Move Forward"
-                    ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
-                    : "bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800"
-                }`} variant="outline">
-                  {assessment.recommendation}
-                </Badge>
+                {(() => {
+                  const final = assessment.adminDecision ?? assessment.recommendation;
+                  const isForward = final === "Move Forward";
+                  return (
+                    <div className="flex flex-col items-end gap-1 mt-2">
+                      <Badge className={`text-sm ${isForward
+                        ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+                        : "bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800"
+                      }`} variant="outline">
+                        {final}
+                      </Badge>
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        {assessment.adminDecision ? "Admin decision" : "AI decision"}
+                      </span>
+                    </div>
+                  );
+                })()}
               </div>
             </CardContent>
           </Card>
