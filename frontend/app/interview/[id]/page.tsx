@@ -28,6 +28,7 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   const [liveText, setLiveText] = useState("");
   const [timeLeft, setTimeLeft] = useState(360);
   const [statusMsg, setStatusMsg] = useState("Click 'Begin' to start your interview");
+  const [candidateName, setCandidateName] = useState("");
 
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState("");
@@ -59,6 +60,11 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   }
 
   async function openSetup() {
+    const stored = sessionStorage.getItem(`iv_${id}`);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed.candidateName) setCandidateName(parsed.candidateName);
+    }
     try {
       // get permission first so enumerateDevices returns proper labels
       const perm = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -179,7 +185,8 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
   async function begin() {
     const stored = sessionStorage.getItem(`iv_${id}`);
     if (!stored) { router.push("/"); return; }
-    const { firstQuestion, audio } = JSON.parse(stored);
+    const { firstQuestion, audio, candidateName: name } = JSON.parse(stored);
+    if (name) setCandidateName(name);
     sessionStorage.removeItem(`iv_${id}`);
 
     setQuestion(firstQuestion);
@@ -253,8 +260,10 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
         {phase === "setup" && (
           <div className="w-full bg-[#161b22] border border-[#30363d] rounded-xl p-6 flex flex-col gap-5">
             <div>
-              <p className="text-[#f0f6fc] font-medium mb-1">Set up your microphone</p>
-              <p className="text-[#8b949e] text-sm">Select your input device and verify it's working before starting.</p>
+              <p className="text-[#f0f6fc] font-medium mb-1">
+                {candidateName ? `Hi ${candidateName}, set up your microphone` : "Set up your microphone"}
+              </p>
+              <p className="text-[#8b949e] text-sm">Speak clearly and naturally. The AI interviewer will evaluate your English communication skills.</p>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -334,12 +343,41 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
           </div>
         )}
 
+        {/* Pre-interview instructions */}
+        {phase === "start" && (
+          <div className="w-full space-y-3">
+            <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-5">
+              <p className="text-xs font-semibold text-[#8b949e] uppercase tracking-wider mb-3">What to Expect</p>
+              <ul className="space-y-2">
+                {["A 6-minute voice conversation with an AI interviewer", "Questions about your teaching experience and approach", "The AI will follow up naturally based on your answers", "Your responses are evaluated on communication, warmth, and clarity"].map(item => (
+                  <li key={item} className="flex gap-2.5 text-sm text-[#f0f6fc]">
+                    <span className="text-indigo-400 mt-0.5">✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-[#161b22] border border-[#30363d] rounded-xl p-5">
+              <p className="text-xs font-semibold text-[#8b949e] uppercase tracking-wider mb-3">Best Practices</p>
+              <ul className="space-y-2">
+                {["Find a quiet environment with no background noise", "Use headphones for best audio quality", "Speak clearly and at a natural pace", "Allow microphone access when prompted"].map(item => (
+                  <li key={item} className="flex gap-2.5 text-sm text-[#f0f6fc]">
+                    <span className="text-indigo-400 mt-0.5">✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
         {/* Mic / status */}
         <div className="flex flex-col items-center gap-3">
           {phase === "start" && (
             <button
               onClick={openSetup}
-              className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-colors"
+              className="w-full px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-colors"
             >
               Begin Interview
             </button>

@@ -34,6 +34,7 @@ export default function LandingPage() {
       sessionStorage.setItem(`iv_${interview.data.interviewId}`, JSON.stringify({
         firstQuestion: interview.data.firstQuestion,
         audio: interview.data.audio,
+        candidateName: name.trim(),
       }));
       router.push(`/interview/${interview.data.interviewId}`);
     } catch (e: unknown) {

@@ -43,6 +43,7 @@ export default function CandidateResultPage() {
     sessionStorage.setItem(`iv_${res.data.interviewId}`, JSON.stringify({
       firstQuestion: res.data.firstQuestion,
       audio: res.data.audio,
+      candidateName: data.candidateName ?? "",
     }));
     router.push(`/interview/${res.data.interviewId}`);
   }
