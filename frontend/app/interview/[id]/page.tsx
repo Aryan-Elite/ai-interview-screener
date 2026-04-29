@@ -137,13 +137,12 @@ export default function InterviewPage({ params }: { params: Promise<{ id: string
     tick();
   }
 
-  async function endInterview() {
+  function endInterview() {
     if (endedRef.current) return;
     endedRef.current = true;
     updatePhase("done");
-    setStatusMsg("Generating your report...");
     stopSttRef.current?.();
-    await generateAssessment(id, tabSwitches.current);
+    generateAssessment(id, tabSwitches.current);
     router.push(`/report/${id}`);
   }
 

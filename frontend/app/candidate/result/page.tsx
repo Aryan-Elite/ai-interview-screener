@@ -113,9 +113,9 @@ function MoveForwardView({ data }: { data: ResultData }) {
     <div className="space-y-6">
       <div className="text-center">
         <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center mx-auto mb-5">
-          <span className="text-3xl">✓</span>
+          <span className="text-3xl text-emerald-500">✓</span>
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Congratulations!</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Congratulations! 🎉</h2>
         <p className="text-gray-500 dark:text-gray-400 text-base leading-relaxed">
           You&apos;ve cleared the AI screening and moved to the next round.
           Our team will reach out to you soon with next steps.

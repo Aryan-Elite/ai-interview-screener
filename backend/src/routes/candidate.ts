@@ -28,14 +28,15 @@ router.get("/result", requireCandidate, async (req: Request, res: Response, next
       return res.json({ success: true, data: { status: "pending" } });
     }
 
+    const finalRecommendation = assessment.adminDecision ?? assessment.recommendation;
     const baseResult = {
       status: "released",
-      recommendation: assessment.recommendation,
+      recommendation: finalRecommendation,
       candidateName: candidate.name,
-      canRetake: assessment.recommendation === "Rejected" && (candidate.retakeCount ?? 0) < 1,
+      canRetake: finalRecommendation === "Rejected" && (candidate.retakeCount ?? 0) < 1,
     };
 
-    if (assessment.recommendation === "Rejected") {
+    if (finalRecommendation === "Rejected") {
       return res.json({
         success: true,
         data: {
